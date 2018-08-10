@@ -32,7 +32,8 @@ public class MyBehavior : MonoBehaviour
         yield return routineMgr.WaitForSeconds(1);
         Routine.SetResult(i * 2);
     }
-}```
+}
+```
 
 Here we add a RoutineManager and run a simple routine that loops from 0 to 4. It then calls a child which waits for a second and returns the number multiplied by 2, which is received by the parent and sent to the console.
 
