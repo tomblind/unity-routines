@@ -202,6 +202,7 @@ namespace Routines
 		//Release routine back to pool
 		public static void Release(ref Routine routine)
 		{
+			routine.Reset();
 			pool.Push(routine);
 			routine = null;
 		}
@@ -293,6 +294,7 @@ namespace Routines
 		{
 			foreach (var child in children)
 			{
+				child.Reset();
 				pool.Push(child);
 			}
 			children.Clear();
