@@ -46,7 +46,7 @@ namespace Routines
 
 			public void Stop()
 			{
-				if (id == routine.id)
+				if (routine != null && id == routine.id)
 				{
 					routine.Stop();
 				}
