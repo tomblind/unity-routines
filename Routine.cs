@@ -38,6 +38,14 @@ namespace Routines
 			private Routine routine;
 			private ulong id;
 
+			public bool IsDone
+			{
+				get
+				{
+					return (routine == null || id != routine.id || routine.IsDone);
+				}
+			}
+
 			public Handle(Routine routine, ulong id)
 			{
 				this.routine = routine;
