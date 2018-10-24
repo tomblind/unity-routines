@@ -25,8 +25,6 @@ using UnityEngine;
 
 namespace Routines
 {
-	public delegate void OnProgressDelegate(float progress);
-
 	public class RoutineContext : IRoutineContext
 	{
 		private class NextFrameResumable : Resumable
@@ -132,7 +130,7 @@ namespace Routines
 			}
 		}
 
-		public IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, OnProgressDelegate onProgress = null)
+		public IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, System.Action<float> onProgress = null)
 		{
 			var lastProgress = (onProgress != null) ? asyncOperation.progress : float.MaxValue;
 			while (!asyncOperation.isDone)

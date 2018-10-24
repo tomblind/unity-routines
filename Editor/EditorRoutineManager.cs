@@ -55,7 +55,7 @@ namespace Routines
 			return context.WaitUntilCondition(condition);
 		}
 
-		public IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, OnProgressDelegate onProgress = null)
+		public IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, System.Action<float> onProgress = null)
 		{
 			return context.WaitForAsyncOperation(asyncOperation, onProgress);
 		}
@@ -89,7 +89,7 @@ namespace Routines
 
 		private void Stop()
 		{
-			if (context == null) 
+			if (context == null)
 			{
 				return;
 			}

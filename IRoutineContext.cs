@@ -10,7 +10,7 @@ namespace Routines
 		IEnumerator WaitForNextFrame();
 		IEnumerator WaitForSeconds(float seconds);
 		IEnumerator WaitUntilCondition(System.Func<bool> condition);
-		IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, OnProgressDelegate onProgress = null);
+		IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, System.Action<float> onProgress = null);
 		IEnumerator WaitForCustomYieldInstruction(CustomYieldInstruction yieldInstruction);
 	}
 
