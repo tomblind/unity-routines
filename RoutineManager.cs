@@ -25,66 +25,66 @@ using UnityEngine;
 
 namespace Routines
 {
-    public delegate void OnProgressDelegate(float progress);
+	public delegate void OnProgressDelegate(float progress);
 
 	public class RoutineManager : MonoBehaviour, IRoutineContext
 	{
-        private RoutineContext context = new RoutineContext();
+		private RoutineContext context = new RoutineContext();
 
-        protected void Update()
-        {
-            context.Update();
-        }
+		protected void Update()
+		{
+			context.Update();
+		}
 
-        protected void LateUpdate()
-        {
-            context.LateUpdate();
-        }
+		protected void LateUpdate()
+		{
+			context.LateUpdate();
+		}
 
-        public void OnDestroy()
+		public void OnDestroy()
 		{
 			context.StopAllRoutines();
 		}
 
 		public Routine.Handle RunRoutine(IEnumerator enumerator, System.Action onStop = null)
 		{
-            return context.RunRoutine(enumerator, this, onStop);
+			return context.RunRoutine(enumerator, this, onStop);
 		}
 
 		public void StopAllRoutines()
 		{
-            context.StopAllRoutines();
+			context.StopAllRoutines();
 		}
 
 		public IEnumerator WaitForNextFrame()
 		{
-            return context.WaitForNextFrame();
+			return context.WaitForNextFrame();
 		}
 
 		public IEnumerator WaitForSeconds(float seconds)
 		{
-            return context.WaitForSeconds(seconds);
+			return context.WaitForSeconds(seconds);
 		}
 
 		public IEnumerator WaitUntilCondition(System.Func<bool> condition)
 		{
-            return context.WaitUntilCondition(condition);
+			return context.WaitUntilCondition(condition);
 		}
 
 		public IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, OnProgressDelegate onProgress = null)
 		{
-            return context.WaitForAsyncOperation(asyncOperation, onProgress);
+			return context.WaitForAsyncOperation(asyncOperation, onProgress);
 		}
 
 		public IEnumerator WaitForCustomYieldInstruction(CustomYieldInstruction yieldInstruction)
 		{
-            return context.WaitForCustomYieldInstruction(yieldInstruction);
+			return context.WaitForCustomYieldInstruction(yieldInstruction);
 		}
-    }
+	}
 
-    public class RoutineContext : IRoutineContext
-    {
-        private class NextFrameResumable : Resumable
+	public class RoutineContext : IRoutineContext
+	{
+		private class NextFrameResumable : Resumable
 		{
 			public List<IResumer> newResumers = new List<IResumer>();
 			public List<IResumer> resumers = new List<IResumer>();
@@ -143,9 +143,9 @@ namespace Routines
 		}
 
 		public Routine.Handle RunRoutine(IEnumerator enumerator, System.Action onStop = null)
-        {
-            return RunRoutine(enumerator, null);
-        }
+		{
+			return RunRoutine(enumerator, null);
+		}
 
 		public Routine.Handle RunRoutine(IEnumerator enumerator, Object context, System.Action onStop = null)
 		{
