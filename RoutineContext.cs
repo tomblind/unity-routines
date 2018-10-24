@@ -122,7 +122,7 @@ namespace Routines
 			}
 		}
 
-		public IEnumerator WaitUntilCondition(System.Func<bool> condition)
+		public IEnumerator WaitUntil(System.Func<bool> condition)
 		{
 			while (!condition())
 			{

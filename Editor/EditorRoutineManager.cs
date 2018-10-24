@@ -50,9 +50,9 @@ namespace Routines
 			return context.WaitForSeconds(seconds);
 		}
 
-		public IEnumerator WaitUntilCondition(System.Func<bool> condition)
+		public IEnumerator WaitUntil(System.Func<bool> condition)
 		{
-			return context.WaitUntilCondition(condition);
+			return context.WaitUntil(condition);
 		}
 
 		public IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, System.Action<float> onProgress = null)

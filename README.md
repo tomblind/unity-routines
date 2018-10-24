@@ -83,7 +83,7 @@ DoAnyOfTheThings() uses Routine.Any(). This is similar to Routine.All() except t
 RoutineManager also provides a number of useful WaitFor...() methods that can be yielded. These are replacements for the built-in Unity YieldInstructions like WaitForSeconds.
 - WaitForNextFrame()
 - WaitForSeconds()
-- WaitUntilCondition()
+- WaitUntil()
 - WaitForAsyncOperation()
 - WaitForCustomYieldInstruction() //Can be used to yield on Unity CustomYieldInstructions, including WWW
 
@@ -120,7 +120,7 @@ public class MyBehavior : MonoBehaviour
             Routine.Release(ref r);
         }
     }
-    
+
     public IEnumerator MyRoutine()
     {
         ...
