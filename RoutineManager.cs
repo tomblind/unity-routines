@@ -25,129 +25,58 @@ using UnityEngine;
 
 namespace Routines
 {
-	public class RoutineManager : MonoBehaviour
+	public class RoutineManager : MonoBehaviour, IRoutineContext
 	{
-		public delegate void OnProgressDelegate(float progress);
+		private RoutineContext context = new RoutineContext();
 
-		private class NextFrameResumable : Resumable
+		protected void Update()
 		{
-			public List<IResumer> newResumers = new List<IResumer>();
-			public List<IResumer> resumers = new List<IResumer>();
-
-			public override void Run(IResumer resumer)
-			{
-				newResumers.Add(resumer);
-			}
-
-			public void Resume()
-			{
-				foreach (var resumer in resumers)
-				{
-					resumer.Resume();
-				}
-				resumers.Clear();
-			}
-
-			public void Flush()
-			{
-				resumers.AddRange(newResumers);
-				newResumers.Clear();
-			}
+			context.Update();
 		}
 
-		private NextFrameResumable nextFrameResumable = new NextFrameResumable();
-		private List<Routine> activeRoutines = new List<Routine>();
-
-		public virtual void Update()
+		protected void LateUpdate()
 		{
-			for (var i = 0; i < activeRoutines.Count;)
-			{
-				var routine = activeRoutines[i];
-				if (routine.IsDone)
-				{
-					Routine.Release(ref routine);
-					activeRoutines.RemoveAt(i);
-				}
-				else
-				{
-					++i;
-				}
-			}
-
-			nextFrameResumable.Resume();
+			context.LateUpdate();
 		}
 
-		public virtual void LateUpdate()
+		public void OnDestroy()
 		{
-			nextFrameResumable.Flush();
+			context.StopAllRoutines();
 		}
 
-		public virtual void OnDestroy()
+		public Routine.Handle RunRoutine(IEnumerator enumerator, System.Action onStop = null)
 		{
-			StopAllRoutines();
-		}
-
-		public Routine.Handle RunRoutine(IEnumerator enumerator)
-		{
-			var routine = Routine.Create();
-			routine.Start(enumerator, this);
-			activeRoutines.Add(routine);
-			return routine.GetHandle();
+			return context.RunRoutine(enumerator, this, onStop);
 		}
 
 		public void StopAllRoutines()
 		{
-			for (var i = 0; i < activeRoutines.Count; ++i)
-			{
-				var routine = activeRoutines[i];
-				Routine.Release(ref routine);
-			}
-			activeRoutines.Clear();
+			context.StopAllRoutines();
 		}
 
 		public IEnumerator WaitForNextFrame()
 		{
-			return nextFrameResumable;
+			return context.WaitForNextFrame();
 		}
 
 		public IEnumerator WaitForSeconds(float seconds)
 		{
-			while (seconds > 0.0f)
-			{
-				yield return nextFrameResumable;
-				seconds -= Time.deltaTime;
-			}
+			return context.WaitForSeconds(seconds);
 		}
 
 		public IEnumerator WaitUntilCondition(System.Func<bool> condition)
 		{
-			while (!condition())
-			{
-				yield return nextFrameResumable;
-			}
+			return context.WaitUntilCondition(condition);
 		}
 
 		public IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, OnProgressDelegate onProgress = null)
 		{
-			var lastProgress = (onProgress != null) ? asyncOperation.progress : float.MaxValue;
-			while (!asyncOperation.isDone)
-			{
-				yield return nextFrameResumable;
-
-				if (asyncOperation.progress > lastProgress)
-				{
-					lastProgress = asyncOperation.progress;
-					onProgress(lastProgress);
-				}
-			}
+			return context.WaitForAsyncOperation(asyncOperation, onProgress);
 		}
 
 		public IEnumerator WaitForCustomYieldInstruction(CustomYieldInstruction yieldInstruction)
 		{
-			while (yieldInstruction.keepWaiting)
-			{
-				yield return nextFrameResumable;
-			}
+			return context.WaitForCustomYieldInstruction(yieldInstruction);
 		}
 	}
 }

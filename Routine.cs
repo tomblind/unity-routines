@@ -46,6 +46,11 @@ namespace Routines
 				}
 			}
 
+			public Routine Get()
+			{
+				return IsDone ? null : routine;
+			}
+
 			public Handle(Routine routine, ulong id)
 			{
 				this.routine = routine;
@@ -147,6 +152,7 @@ namespace Routines
 		private bool isStepping = false;
 		private object returnValue = null;
 		private RoutineException error = null;
+		private System.Action onStop;
 
 		private static Stack<Routine> pool = new Stack<Routine>();
 
@@ -160,18 +166,18 @@ namespace Routines
 
 		public bool IsDone { get { return id == noId; } }
 		public System.Exception Error { get { return error; } }
-
-		public void Start(IEnumerator enumerator, Object context = null, ExceptionHandlerDelegate exceptionHandler = null)
+		
+		public void Start(IEnumerator enumerator, Object context = null, ExceptionHandlerDelegate exceptionHandler = null, System.Action onStop = null)
 		{
 			Stop();
-			Setup(enumerator, null, context, exceptionHandler);
+			Setup(enumerator, null, context, exceptionHandler, onStop);
 			Step();
 		}
 
-		public void Start(IEnumerable enumerable, Object context = null, ExceptionHandlerDelegate exceptionHandler = null)
+		public void Start(IEnumerable enumerable, Object context = null, ExceptionHandlerDelegate exceptionHandler = null, System.Action onStop = null)
 		{
 			Stop();
-			Setup(enumerable.GetEnumerator(), null, context, exceptionHandler);
+			Setup(enumerable.GetEnumerator(), null, context, exceptionHandler, onStop);
 			Step();
 		}
 
@@ -183,6 +189,14 @@ namespace Routines
 			finishOnAny = false;
 			isStepping = false;
 			id = noId;
+			
+			var oldOnStop = onStop;
+			onStop = null;
+
+			if (oldOnStop != null)
+			{
+				oldOnStop();
+			}
 		}
 
 		public void Reset()
@@ -284,7 +298,7 @@ namespace Routines
 
 		private Routine() {} //Use Routine.Create()
 
-		private void Setup(IEnumerator enumerator, Routine parent, Object context, ExceptionHandlerDelegate exceptionHandler)
+		private void Setup(IEnumerator enumerator, Routine parent, Object context, ExceptionHandlerDelegate exceptionHandler, System.Action onStop = null)
 		{
 			id = nextId++;
 			Assert.IsTrue(nextId != ulong.MaxValue);
@@ -296,6 +310,7 @@ namespace Routines
 			this.enumerator = enumerator;
 			this.context = context;
 			this.exceptionHandler = exceptionHandler ?? Debug.LogException;
+			this.onStop = onStop;
 		}
 
 		private void ClearChildren()
