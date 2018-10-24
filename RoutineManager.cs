@@ -25,11 +25,66 @@ using UnityEngine;
 
 namespace Routines
 {
-	public class RoutineManager : MonoBehaviour
-	{
-		public delegate void OnProgressDelegate(float progress);
+    public delegate void OnProgressDelegate(float progress);
 
-		private class NextFrameResumable : Resumable
+	public class RoutineManager : MonoBehaviour, IRoutineContext
+	{
+        private RoutineContext context = new RoutineContext();
+
+        protected void Update()
+        {
+            context.Update();
+        }
+
+        protected void LateUpdate()
+        {
+            context.LateUpdate();
+        }
+
+        public void OnDestroy()
+		{
+			context.StopAllRoutines();
+		}
+
+		public Routine.Handle RunRoutine(IEnumerator enumerator, System.Action onStop = null)
+		{
+            return context.RunRoutine(enumerator, this, onStop);
+		}
+
+		public void StopAllRoutines()
+		{
+            context.StopAllRoutines();
+		}
+
+		public IEnumerator WaitForNextFrame()
+		{
+            return context.WaitForNextFrame();
+		}
+
+		public IEnumerator WaitForSeconds(float seconds)
+		{
+            return context.WaitForSeconds(seconds);
+		}
+
+		public IEnumerator WaitUntilCondition(System.Func<bool> condition)
+		{
+            return context.WaitUntilCondition(condition);
+		}
+
+		public IEnumerator WaitForAsyncOperation(AsyncOperation asyncOperation, OnProgressDelegate onProgress = null)
+		{
+            return context.WaitForAsyncOperation(asyncOperation, onProgress);
+		}
+
+		public IEnumerator WaitForCustomYieldInstruction(CustomYieldInstruction yieldInstruction)
+		{
+            return context.WaitForCustomYieldInstruction(yieldInstruction);
+		}
+    }
+
+    public class RoutineContext : IRoutineContext
+    {
+        private class NextFrameResumable : Resumable
 		{
 			public List<IResumer> newResumers = new List<IResumer>();
 			public List<IResumer> resumers = new List<IResumer>();
@@ -58,7 +113,7 @@ namespace Routines
 		private NextFrameResumable nextFrameResumable = new NextFrameResumable();
 		private List<Routine> activeRoutines = new List<Routine>();
 
-		public virtual void Update()
+		public void Update()
 		{
 			for (var i = 0; i < activeRoutines.Count;)
 			{
@@ -77,20 +132,25 @@ namespace Routines
 			nextFrameResumable.Resume();
 		}
 
-		public virtual void LateUpdate()
+		public void LateUpdate()
 		{
 			nextFrameResumable.Flush();
 		}
 
-		public virtual void OnDestroy()
+		public void OnDestroy()
 		{
 			StopAllRoutines();
 		}
 
-		public Routine.Handle RunRoutine(IEnumerator enumerator)
+		public Routine.Handle RunRoutine(IEnumerator enumerator, System.Action onStop = null)
+        {
+            return RunRoutine(enumerator, null);
+        }
+
+		public Routine.Handle RunRoutine(IEnumerator enumerator, Object context, System.Action onStop = null)
 		{
 			var routine = Routine.Create();
-			routine.Start(enumerator, this);
+			routine.Start(enumerator, context, null, onStop);
 			activeRoutines.Add(routine);
 			return routine.GetHandle();
 		}
