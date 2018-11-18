@@ -1,4 +1,7 @@
 # Routines for Unity
+
+_If you're using Unity 2018.3 or newer, check out [Unity AsyncRoutines](https://github.com/tomblind/unity-async-routines) which accomplishes the same thing, but uses C# 7's async/await for cleaner and more type-safe syntax._
+
 ## What Is It?
 Routines is a replacement for Unity's coroutines that provides hierarchical support. This means that a running routine can yield on one or more child routines and resume when they complete. Routines also utilize pooling under the hood to reduce garbage generation as much as possible so that they can used extensively without dropping frames.
 
